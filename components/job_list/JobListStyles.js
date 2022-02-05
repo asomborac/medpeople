@@ -191,7 +191,7 @@ export const styles = StyleSheet.create({
     modal: {
         backgroundColor: "#fff",
         width: 350,
-        height: 450,
+        height: 420,
         borderRadius: 14,
         shadowColor: '#000',
         shadowOffset: { width: 1, height: 1 },
@@ -201,4 +201,40 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    filterTitle: {
+        fontWeight: 'bold',
+        fontSize: 22,
+        marginHorizontal: 20,
+        marginVertical: 10
+    },
+    dropdown: {
+        zIndex: 2000
+    },
+    dropdownLabel: {
+        fontWeight: 'bold'
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+        marginLeft: 30
+    },
+    buttonHighlight: {
+        width: 100,
+        height: 40,
+        marginHorizontal: 0
+    },
+    modalButton: {
+        width: 70,
+        height: 30,
+        backgroundColor: '#FF4F70',
+        borderRadius: 6,
+    },
+    modalButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 18,
+        lineHeight: 26,
+        textAlign: 'center'
+    }
 });
