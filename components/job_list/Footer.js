@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 
 export default function Footer({ campaigns, scrollView, filteredFavorites, filtersVisible, setFiltersVisible }) {
 
-    console.log(filteredFavorites)
-
     return <View style={campaigns.length > 0 ? styles.footer : styles.footerEmtpy}>
+
         {campaigns.map((item, i) => {
+            // Rendering scroll To buttons for campaigns with at least one hospital
             if (item) {
                 let icon = null;
                 if (item === 'Weekend shifts') icon = <Icon name='calendar-outline' fill='white' width={24} height={24} />
@@ -25,7 +25,7 @@ export default function Footer({ campaigns, scrollView, filteredFavorites, filte
                 </TouchableHighlight>
             }
         })}
-        {filteredFavorites.length > 0 ?
+        {filteredFavorites.length > 0 ?  // Disabled or enabled scroll To button for favorites
             <TouchableHighlight onPress={() => scrollView.scrollTo({ x: 0, y: 1560, animated: true })} underlayColor='none' style={styles.footerIcon} disabled={false}>
                 <Icon name='heart-outline' fill='white' width={24} height={24} />
             </TouchableHighlight>
@@ -44,7 +44,7 @@ export default function Footer({ campaigns, scrollView, filteredFavorites, filte
 
 Footer.propTypes = {
     campaigns: PropTypes.arrayOf(PropTypes.string).isRequired,
-    scrollView: PropTypes.object.isRequired,
+    scrollView: PropTypes.object,
     filteredFavorites: PropTypes.arrayOf(PropTypes.number).isRequired,
     filtersVisible: PropTypes.bool,
     setFiltersVisible: PropTypes.func.isRequired

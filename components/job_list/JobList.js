@@ -11,24 +11,27 @@ import Footer from './Footer';
 
 export default function JobList({ navigation }) {
 
-    const data = jobs.jobs;
+    const data = jobs.jobs; // Json data
 
-    const [scrollView, setScrollView] = useState(null);
+    const [scrollView, setScrollView] = useState(null); // Ref for the scrollTo function
     const [favorites, setFavorites] = useState([]);
 
     const [filtersVisible, setFiltersVisible] = useState(false);
-    const [filterRating, setFilterRating] = useState(0);
 
+    const [filterRating, setFilterRating] = useState(0); // Stars filter selected
+
+    // Location dropdown
     const [locationOpen, setLocationOpen] = useState(false);
     const [location, setLocation] = useState([]);
     const [locations, setLocations] = useState([]);
 
+    // Depratment dropdown
     const [departmentOpen, setDepartmentOpen] = useState(false);
     const [department, setDepartment] = useState([]);
     const [departments, setDepartments] = useState([]);
 
+    // Creating dropdown options from the json file
     useEffect(() => {
-        // Creating dropdown options from the json file
         let loc = [...new Set(data.map(item => item.address.city))];
         loc = loc.map((item, i) => { return { label: item, value: i } })
         setLocations(loc);
@@ -38,49 +41,50 @@ export default function JobList({ navigation }) {
         setDepartments(dep);
     }, []);
 
+    // Handles the state array of selected favorites
     const handleFavorites = (id) => {
         if (favorites.includes(id)) setFavorites(favorites.filter(fav => fav !== id));
         else setFavorites(prevState => [...prevState, id]);
     };
 
+    // Empty arrays for rendering stars for rating
     let filterStarsFull = [];
     let filterStarsEmpty = [];
     for (let j = 0; j < filterRating; j += 1) filterStarsFull.push(null);
     for (let j = 0; j < 5 - filterRating; j += 1) filterStarsEmpty.push(null);
 
+    // Filtering data acquired from the json file 
     let filtered = data;
     if (filterRating > 0) filtered = data.filter(item => item.average_rating >= filterRating);
 
     if (location.length > 0) {
         filtered = filtered.filter(item => {
-
-            let tempLocations = [];
-            let tempLocationsStrings = [];
+            let tempLocations = [], tempLocationsStrings = [];
 
             location.forEach(item => tempLocations.push(locations.filter(el => el.value === item)));
             tempLocations.forEach(item => tempLocationsStrings.push(item[0].label));
 
-            if (tempLocationsStrings.includes(item.address.city)) return item
+            if (tempLocationsStrings.includes(item.address.city)) return item;
         })
     };
 
     if (department.length > 0) {
         filtered = filtered.filter(item => {
-
-            let tempDepartments = [];
-            let tempDepartmentsStrings = [];
+            let tempDepartments = [], tempDepartmentsStrings = [];
 
             department.forEach(item => tempDepartments.push(departments.filter(el => el.value === item)));
             tempDepartments.forEach(item => tempDepartmentsStrings.push(item[0].label));
 
-            if (tempDepartmentsStrings.includes(item.department)) return item
+            if (tempDepartmentsStrings.includes(item.department)) return item;
         })
     };
 
+    // Filtering the list of campaigns to show
     let campaigns = [];
     filtered.forEach(item => item.campaigns.forEach(el => campaigns.push(el)));
     campaigns = [...new Set(campaigns)];
 
+    // Filtering the list of favorites
     let filteredIDs = filtered.map(item => item.id)
     let filteredFavorites = filteredIDs.filter(item => favorites.includes(item))
 
@@ -135,12 +139,12 @@ export default function JobList({ navigation }) {
                     })}
                     <View style={styles.employerLast} />
                 </ScrollView>
-            </View>
-            }
+            </View>}
 
             {filteredFavorites.length === 0 && campaigns.length === 0 && <CampaignHeader icon='close-circle-outline' title='No campaigns available' />}
 
         </ScrollView>
+
         <View style={styles.endPadding} />
 
         <Footer

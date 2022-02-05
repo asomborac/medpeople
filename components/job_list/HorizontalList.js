@@ -5,12 +5,14 @@ import PropTypes from 'prop-types';
 
 export default function HorizontalList({ e, el, item, filteredFavorites, handleFavorites, navigation, type }) {
 
+    // Calculation for shifts
     let shifts = [];
     el.available_shifts.forEach(shift => shifts.push(shift.hourly_pay_in_eur * shift.number_of_hours))
 
     let bestShift = Math.max(...shifts);
     let numberOfShifts = el.available_shifts.length;
 
+    // Empty arrays for mapping stars (rating) of the hospital
     let rating = el.average_rating;
     let starsFull = [];
     let starsEmpty = [];
@@ -48,16 +50,15 @@ export default function HorizontalList({ e, el, item, filteredFavorites, handleF
         </View>
     </TouchableHighlight>
 
+    // Rendering filtered horizontal lists for every campaign, except favorites 
     if (type === 'dynamic') {
-        if (el.campaigns.includes(item)) {
-            return renderList
-        }
+        if (el.campaigns.includes(item)) return renderList;
         else return <View />
     }
+
+    // Rendering filtered horizontal list for favorites
     else if (type === 'favorites') {
-        if (filteredFavorites.includes(el.id)) {
-            return renderList
-        }
+        if (filteredFavorites.includes(el.id)) return renderList;
         else return <View />
     }
 };

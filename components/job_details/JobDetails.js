@@ -78,6 +78,7 @@ export default function JobList({ route, navigation }) {
 
             <View style={styles.shiftContainer}>
                 {data.available_shifts.map((item, i) => {
+                    // Mapping shifts to pseudo table
                     let hour = Number(data.available_shifts[i].time.substring(0, 2));
                     return <View key={i}>
                         <View style={isOdd(i) ? styles.timeContainerOdd : styles.timeContainer}>
