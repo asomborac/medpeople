@@ -1,5 +1,4 @@
 import { Text, View, ScrollView, SafeAreaView, TouchableHighlight, Modal } from 'react-native';
-import * as React from 'react';
 import jobs from './../../jobs.json';
 import { Icon } from 'react-native-eva-icons';
 import { styles } from './JobListStyles';

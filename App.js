@@ -1,4 +1,4 @@
-import Loading from './Loading';
+import Loading from './components/Loading';
 import JobList from './components/job_list/JobList';
 import JobDetails from './components/job_details/JobDetails';
 import { NavigationContainer } from '@react-navigation/native';
