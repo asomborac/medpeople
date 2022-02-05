@@ -151,6 +151,21 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 15
     },
+    footerEmtpy: {
+        height: 60,
+        width: '100%',
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'white',
+        borderTopWidth: 1,
+        borderTopColor: '#ededed',
+        justifyContent: 'flex-end',
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        paddingBottom: 12,
+    },
     footerFlex: {
         flexDirection: 'row',
         justifyContent: 'space-between'
@@ -172,6 +187,16 @@ export const styles = StyleSheet.create({
         marginTop: 12,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    searchIconEmpty: {
+        height: 36,
+        width: 36,
+        borderRadius: 60,
+        backgroundColor: '#FEF5F1',
+        marginTop: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 20
     },
     footerIconDisabled: {
         height: 36,
@@ -217,24 +242,24 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 20,
-        marginLeft: 30
+        marginLeft: 10
     },
     buttonHighlight: {
         width: 100,
         height: 40,
-        marginHorizontal: 0
+        marginHorizontal: 6
     },
     modalButton: {
-        width: 70,
-        height: 30,
+        width: 90,
+        height: 36,
         backgroundColor: '#FF4F70',
-        borderRadius: 6,
+        borderRadius: 60,
     },
     modalButtonText: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 18,
-        lineHeight: 26,
+        lineHeight: 32,
         textAlign: 'center'
     }
 });

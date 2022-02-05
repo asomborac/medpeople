@@ -1,10 +1,13 @@
-import { Text, View, ScrollView, SafeAreaView, ImageBackground, TouchableHighlight, Modal, Button } from 'react-native';
+import { Text, View, ScrollView, SafeAreaView, TouchableHighlight, Modal } from 'react-native';
 import * as React from 'react';
 import jobs from './../../jobs.json';
 import { Icon } from 'react-native-eva-icons';
 import { styles } from './JobListStyles';
 import { useState, useEffect } from 'react/cjs/react.development';
 import DropDownPicker from 'react-native-dropdown-picker';
+import CampaignHeader from './CampaignHeader';
+import HorizontalList from './HorizontalList';
+import Footer from './Footer';
 
 export default function JobList({ navigation }) {
 
@@ -40,21 +43,12 @@ export default function JobList({ navigation }) {
         else setFavorites(prevState => [...prevState, id]);
     };
 
-    const campaigns = [
-        'Urgent vacancies',
-        'Weekend shifts',
-        'Recently added',
-        'Best paid shifts',
-    ];
-
     let filterStarsFull = [];
     let filterStarsEmpty = [];
-
     for (let j = 0; j < filterRating; j += 1) filterStarsFull.push(null);
     for (let j = 0; j < 5 - filterRating; j += 1) filterStarsEmpty.push(null);
 
     let filtered = data;
-
     if (filterRating > 0) filtered = data.filter(item => item.average_rating >= filterRating);
 
     if (location.length > 0) {
@@ -68,7 +62,7 @@ export default function JobList({ navigation }) {
 
             if (tempLocationsStrings.includes(item.address.city)) return item
         })
-    }
+    };
 
     if (department.length > 0) {
         filtered = filtered.filter(item => {
@@ -81,9 +75,14 @@ export default function JobList({ navigation }) {
 
             if (tempDepartmentsStrings.includes(item.department)) return item
         })
-    }
+    };
 
-    console.log(filtered.length)
+    let campaigns = [];
+    filtered.forEach(item => item.campaigns.forEach(el => campaigns.push(el)));
+    campaigns = [...new Set(campaigns)];
+
+    let filteredIDs = filtered.map(item => item.id)
+    let filteredFavorites = filteredIDs.filter(item => favorites.includes(item))
 
     return <SafeAreaView style={styles.container}>
         <View style={styles.bottomShadow}>
@@ -97,164 +96,60 @@ export default function JobList({ navigation }) {
             {campaigns.map((item, i) => {
                 if (item) {
                     let icon = null;
-                    if (item === 'Weekend shifts') icon = <Icon name='calendar-outline' fill='white' width={24} height={24} />
-                    else if (item === 'Best paid shifts') icon = <Icon name='checkmark-circle-outline' fill='white' width={24} height={24} />
-                    else if (item === 'Urgent vacancies') icon = <Icon name='alert-triangle-outline' fill='white' width={24} height={24} />
-                    else if (item === 'Recently added') icon = <Icon name='clock-outline' fill='white' width={24} height={24} />
+                    if (item === 'Weekend shifts') icon = 'calendar-outline';
+                    else if (item === 'Best paid shifts') icon = 'checkmark-circle-outline';
+                    else if (item === 'Urgent vacancies') icon = 'alert-triangle-outline';
+                    else if (item === 'Recently added') icon = 'clock-outline';
 
                     return <View key={i}>
-                        <View style={styles.campaign}>
-                            <View style={styles.campaignIcon}>
-                                {icon}
-                            </View>
-                            <Text style={styles.campaignTitle}>{item}</Text>
-                        </View>
+                        <CampaignHeader icon={icon} title={item} />
 
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.employerScrollView}>
                             {filtered.map((el, e) => {
-
-                                let shifts = [];
-                                el.available_shifts.forEach(shift => shifts.push(shift.hourly_pay_in_eur * shift.number_of_hours))
-
-                                let bestShift = Math.max(...shifts);
-                                let numberOfShifts = el.available_shifts.length;
-
-                                let rating = el.average_rating;
-                                let starsFull = [];
-                                let starsEmpty = [];
-
-                                for (let j = 0; j < rating; j += 1) starsFull.push(null);
-                                for (let j = 0; j < 5 - rating; j += 1) starsEmpty.push(null);
-
-                                if (el.campaigns.includes(item)) {
-
-                                    return <TouchableHighlight key={e} onPress={() => navigation.navigate('Details', { filtered: el, favorites })} underlayColor='none'>
-                                        <View style={styles.employerContainer} >
-                                            <ImageBackground source={{ uri: el.background_image }} style={styles.image} imageStyle={{ borderTopLeftRadius: 14, borderTopRightRadius: 14 }}   >
-                                                <View style={styles.headerContainer}>
-                                                    <ImageBackground source={{ uri: el.logo }} style={styles.avatar} imageStyle={{ borderRadius: 50 }} />
-                                                    <TouchableHighlight onPress={() => handleFavorites(el.id)} underlayColor='none'>
-                                                        <Icon name={favorites.includes(el.id) ? 'heart' : 'heart-outline'} fill='white' width={48} height={48} />
-                                                    </TouchableHighlight>
-                                                </View>
-                                            </ImageBackground>
-                                            <View style={styles.employerContent}>
-                                                <Text style={styles.employerName}>{el.employer_name}</Text>
-                                            </View>
-                                            <View style={styles.departmentContainer}>
-                                                <Text style={styles.department}>{el.department}</Text>
-                                            </View>
-                                            <View style={styles.shiftsContainer}>
-                                                <Text style={styles.shiftsText}>Up to {bestShift}€ per shift</Text>
-                                                <Text style={styles.shiftsText}>{numberOfShifts} shifts</Text>
-                                            </View>
-                                            <View style={styles.bottomContainer}>
-                                                <Text style={styles.locationText}>{el.address.city}</Text>
-                                                <View style={styles.starContainer}>
-                                                    {starsFull.map((star, key) => <Icon key={key} name='star' fill='#FF4F70' width={20} height={20} />)}
-                                                    {starsEmpty.map((star, key) => <Icon key={numberOfShifts + key} name='star-outline' fill='#FF4F70' width={20} height={20} />)}
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </TouchableHighlight>
-                                }
+                                return <HorizontalList
+                                    key={e} e={e} el={el} item={item}
+                                    filteredFavorites={filteredFavorites}
+                                    handleFavorites={handleFavorites}
+                                    navigation={navigation}
+                                    type='dynamic'
+                                />
                             })}
-
                             <View style={styles.employerLast} />
                         </ScrollView>
                     </View>
                 }
             })}
 
-            {favorites.length > 0 && <View>
-                <View style={styles.campaign}>
-                    <View style={styles.campaignIcon}>
-                        <Icon name='heart-outline' fill='white' width={24} height={24} />
-                    </View>
-                    <Text style={styles.campaignTitle}>Favorites</Text>
-                </View>
+            {filteredFavorites.length > 0 && <View>
+                <CampaignHeader icon='heart-outline' title='Favorites' />
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.employerScrollView}>
                     {filtered.map((el, e) => {
-
-                        if (favorites.includes(el.id)) {
-
-                            let shifts = [];
-                            el.available_shifts.forEach(shift => shifts.push(shift.hourly_pay_in_eur * shift.number_of_hours))
-
-                            let bestShift = Math.max(...shifts);
-                            let numberOfShifts = el.available_shifts.length;
-
-                            let rating = el.average_rating;
-                            let starsFull = [];
-                            let starsEmpty = [];
-
-                            for (let j = 0; j < rating; j += 1)  starsFull.push(null);
-                            for (let j = 0; j < 5 - rating; j += 1)  starsEmpty.push(null);
-
-                            return <TouchableHighlight key={e} onPress={() => navigation.navigate('Details', { filtered: el, favorites })} underlayColor='none'>
-                                <View style={styles.employerContainer} >
-                                    <ImageBackground source={{ uri: el.background_image }} style={styles.image} imageStyle={{ borderTopLeftRadius: 14, borderTopRightRadius: 14 }}   >
-                                        <View style={styles.headerContainer}>
-                                            <ImageBackground source={{ uri: el.logo }} style={styles.avatar} imageStyle={{ borderRadius: 50 }} />
-                                            <TouchableHighlight onPress={() => handleFavorites(el.id)} underlayColor='none'>
-                                                <Icon name={favorites.includes(el.id) ? 'heart' : 'heart-outline'} fill='white' width={48} height={48} />
-                                            </TouchableHighlight>
-                                        </View>
-                                    </ImageBackground>
-                                    <View style={styles.employerContent}>
-                                        <Text style={styles.employerName}>{el.employer_name}</Text>
-                                    </View>
-                                    <View style={styles.departmentContainer}>
-                                        <Text style={styles.department}>{el.department}</Text>
-                                    </View>
-                                    <View style={styles.shiftsContainer}>
-                                        <Text style={styles.shiftsText}>Up to {bestShift}€ per shift</Text>
-                                        <Text style={styles.shiftsText}>{numberOfShifts} shifts</Text>
-                                    </View>
-                                    <View style={styles.bottomContainer}>
-                                        <Text style={styles.locationText}>{el.address.city}</Text>
-                                        <View style={styles.starContainer}>
-                                            {starsFull.map((star, key) => <Icon key={key} name='star' fill='#FF4F70' width={20} height={20} />)}
-                                            {starsEmpty.map((star, key) => <Icon key={numberOfShifts + key} name='star-outline' fill='#FF4F70' width={20} height={20} />)}
-                                        </View>
-                                    </View>
-                                </View>
-                            </TouchableHighlight>
-                        }
+                        return <HorizontalList
+                            key={e} e={e} el={el} item='Favorites'
+                            filteredFavorites={filteredFavorites}
+                            handleFavorites={handleFavorites}
+                            navigation={navigation}
+                            type='favorites'
+                        />
                     })}
                     <View style={styles.employerLast} />
                 </ScrollView>
             </View>
             }
+
+            {filteredFavorites.length === 0 && campaigns.length === 0 && <CampaignHeader icon='close-circle-outline' title='No campaigns available' />}
+
         </ScrollView>
         <View style={styles.endPadding} />
-        <View style={styles.footer}>
-            <TouchableHighlight onPress={() => scrollView.scrollTo({ x: 0, y: 0, animated: true })} underlayColor='none' style={styles.footerIcon}>
-                <Icon name='alert-triangle-outline' fill='white' width={24} height={24} />
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => scrollView.scrollTo({ x: 0, y: 390, animated: true })} underlayColor='none' style={styles.footerIcon}>
-                <Icon name='calendar-outline' fill='white' width={24} height={24} />
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => scrollView.scrollTo({ x: 0, y: 780, animated: true })} underlayColor='none' style={styles.footerIcon}>
-                <Icon name='clock-outline' fill='white' width={24} height={24} />
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => scrollView.scrollTo({ x: 0, y: 1170, animated: true })} underlayColor='none' style={styles.footerIcon}>
-                <Icon name='checkmark-circle-outline' fill='white' width={24} height={24} />
-            </TouchableHighlight>
-            {favorites.length > 0 ?
-                <TouchableHighlight onPress={() => scrollView.scrollTo({ x: 0, y: 1560, animated: true })} underlayColor='none' style={styles.footerIcon} disabled={false}>
-                    <Icon name='heart-outline' fill='white' width={24} height={24} />
-                </TouchableHighlight>
-                :
-                <TouchableHighlight underlayColor='none' style={styles.footerIconDisabled} disabled={true}>
-                    <Icon name='heart-outline' fill='white' width={24} height={24} />
-                </TouchableHighlight>
-            }
-            <TouchableHighlight onPress={() => setFiltersVisible(!filtersVisible)} underlayColor='none' style={styles.searchIcon}>
-                <Icon name='funnel-outline' fill='#FF4F70' width={24} height={24} />
-            </TouchableHighlight>
-        </View>
+
+        <Footer
+            campaigns={campaigns}
+            scrollView={scrollView}
+            filteredFavorites={filteredFavorites}
+            filtersVisible={filtersVisible}
+            setFiltersVisible={setFiltersVisible}
+        />
 
         <Modal
             presentationStyle="overFullScreen"
@@ -270,35 +165,19 @@ export default function JobList({ navigation }) {
                     </View>
                     <Text style={styles.filterTitle}>Departments</Text>
                     <DropDownPicker
-                        open={departmentOpen}
-                        value={department}
-                        items={departments}
-                        setOpen={setDepartmentOpen}
-                        setValue={setDepartment}
-                        setItems={setDepartments}
-                        multiple={true}
-                        min={0}
-                        max={3}
-                        style={styles.dropdown}
-                        labelStyle={styles.dropdownLabel}
+                        open={departmentOpen} value={department} items={departments}
+                        setOpen={setDepartmentOpen} setValue={setDepartment} setItems={setDepartments}
+                        style={styles.dropdown} containerStyle={{ width: 240 }} labelStyle={styles.dropdownLabel}
+                        multiple={true} min={0} max={3}
                         stickyHeader={true}
-                        containerStyle={{ width: 240 }}
                     />
                     <Text style={styles.filterTitle}>Locations</Text>
                     <DropDownPicker
-                        open={locationOpen}
-                        value={location}
-                        items={locations}
-                        setOpen={setLocationOpen}
-                        setValue={setLocation}
-                        setItems={setLocations}
-                        multiple={true}
-                        min={0}
-                        max={2}
-                        style={styles.dropdown}
-                        labelStyle={styles.dropdownLabel}
+                        open={locationOpen} value={location} items={locations}
+                        setOpen={setLocationOpen} setValue={setLocation} setItems={setLocations}
+                        style={styles.dropdown} containerStyle={{ width: 240 }} labelStyle={styles.dropdownLabel}
+                        multiple={true} min={0} max={2}
                         stickyHeader={true}
-                        containerStyle={{ width: 240 }}
                     />
                     <View style={styles.buttonContainer}>
                         <TouchableHighlight style={styles.buttonHighlight} underlayColor='none' onPress={() => {

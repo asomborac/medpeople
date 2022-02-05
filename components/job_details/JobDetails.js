@@ -17,7 +17,9 @@ export default function JobList({ route, navigation }) {
             </ImageBackground>
 
             <View style={styles.headerTopRow}>
-                <Icon name='chevron-left-outline' fill='white' width={80} height={80} onPress={() => navigation.navigate('List')} />
+                <TouchableHighlight underlayColor='none' onPress={() => navigation.navigate('List')} >
+                    <Icon name='chevron-left-outline' fill='white' width={80} height={80} />
+                </TouchableHighlight>
                 <View style={styles.headerIcons}>
                     <Icon name='share-outline' fill='white' width={40} height={40} style={styles.headerIconMargin} />
                     <Icon name='map-outline' fill='white' width={40} height={40} style={styles.headerIconMargin}
